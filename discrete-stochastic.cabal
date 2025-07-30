@@ -25,7 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      Discrete.Stochastic
+      Discrete.Stochastic.Time
       Lib
   other-modules:
       Paths_discrete_stochastic
