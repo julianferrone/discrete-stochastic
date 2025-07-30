@@ -1,9 +1,7 @@
-{-# LANGUAGE InstanceSigs #-}
-
 module Discrete.Stochastic.Time (Events (..)) where
 
-import Data.List (sort)
-import Data.Ord (Down, Ordering (..))
+import qualified Data.Ord as Ord
+import qualified Discrete.Stochastic.SortedList as SortedList
 
 ------------------------------------------------------------
 --                         Events                         --
@@ -17,7 +15,7 @@ data TimeStep = Finite Int | Infinite deriving (Eq, Ord, Show)
 
 ----------                 Events                 ----------
 
-newtype Event a = Event {unEvent :: (Down TimeStep, a)} deriving (Eq, Ord, Show)
+newtype Event a = Event {unEvent :: (Ord.Down TimeStep, a)} deriving (Eq, Ord, Show)
 
 instance Functor Event where
   fmap f = Event . fmap f . unEvent
@@ -25,24 +23,17 @@ instance Functor Event where
 
 -- | Events is a sequence of values, tagged with the timesteps
 -- at which they happened.
-newtype Events a = Events {unEvents :: [Event a]} deriving (Eq, Show)
+newtype Events a = Events {unEvents :: SortedList.SortedList (Event a)} deriving (Eq, Show)
 
 -- | Smart constructor that ensures the list of Events is sorted.
 events :: (Ord a) => [Event a] -> Events a
-events es = Events $ sort es
+events es = Events $ SortedList.fromList es
 
-instance Functor Events where
-  fmap f = Events . (fmap . fmap) f . unEvents
-  (<$) f = Events . (fmap . (<$)) f . unEvents
+map :: (Ord b) => (a -> b) -> Events a -> Events b
+map f (Events xs) = Events $ SortedList.map (fmap f) xs
 
--- | Merges two sorted lists into a sorted list.
-mergeSorted :: Ord a => [a] -> [a] -> [a]
-mergeSorted = go []
-  where
-    go :: Ord a => [a] -> [a] -> [a] -> [a]
-    go done [] [] = reverse done            -- No more items to add from either input
-    go done [] ys = go (done <> ys) [] []   -- No more items to add from the left input
-    go done xs [] = go (done <> xs) [] []   -- No more items to add from the right input
-    go done xs@(x : xtail) ys@(y : ytail)   -- Check which head is smaller
-      | x <= y = go (x : done) xtail ys
-      | otherwise = go (y : done) xs ytail
+instance Semigroup (Events a) where
+  e1 <> e2 = Events $ unEvents e1 <> unEvents e2
+
+instance (Ord a) => Monoid (Events a) where
+  mempty = Events {unEvents = mempty}
