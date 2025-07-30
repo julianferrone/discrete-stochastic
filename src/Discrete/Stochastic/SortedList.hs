@@ -11,6 +11,7 @@ module Discrete.Stochastic.SortedList
 where
 
 import qualified Data.List as List
+import Prelude hiding (map)
 
 data SortedList a where
   SortedList :: (Ord a) => [a] -> SortedList a
@@ -40,6 +41,9 @@ instance (Ord a) => Monoid (SortedList a) where mempty = SortedList []
 
 map :: (Ord b) => (a -> b) -> SortedList a -> SortedList b
 map f = fromList . fmap f . toList
+
+instance (Eq a) => Eq (SortedList a) where
+  (SortedList xs) == (SortedList ys) = xs == ys
 
 instance (Show a) => Show (SortedList a) where
   show (SortedList xs) = "SortedList " <> show xs
