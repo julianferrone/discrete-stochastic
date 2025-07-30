@@ -1,4 +1,4 @@
-module Discrete.Stochastic.Time (Events(..)) where
+module Discrete.Stochastic.Time (Events (..)) where
 
 ------------------------------------------------------------
 --                         Events                         --
@@ -6,15 +6,16 @@ module Discrete.Stochastic.Time (Events(..)) where
 
 ----------                  Time                  ----------
 
-data DiscreteTime = Finite Int | Infinite
--- DiscreteTime is a representation of a discrete timestep.
--- It can be either a specific timestep `Finite Int`, or a timestep infinitely
--- far into the future. 
-
+-- | Type of discrete timestep. It can be either a specific,
+-- finite timestep, or a timestep infinitely far into the future.
+data DiscreteTime = Finite Int | Infinite deriving (Eq, Show)
 
 ----------                 Events                 ----------
 
-newtype Events a = Events {unEvents :: [(DiscreteTime, a)]}
--- Events is a sequence of values, tagged with the timesteps 
+-- | Events is a sequence of values, tagged with the timesteps
 -- at which they happened.
+newtype Events a = Events {unEvents :: [(DiscreteTime, a)]}
 
+instance Functor Events where
+  fmap f = Events . (fmap . fmap) f . unEvents
+  (<$) f = Events . (fmap . (<$)) f . unEvents
