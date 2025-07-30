@@ -2,6 +2,7 @@
 
 module Discrete.Stochastic.Time (Events (..)) where
 
+import Data.List (sort)
 import Data.Ord (Down, Ordering (..))
 
 ------------------------------------------------------------
@@ -16,7 +17,7 @@ data TimeStep = Finite Int | Infinite deriving (Eq, Ord, Show)
 
 ----------                 Events                 ----------
 
-newtype Event a = Event {unEvent :: (Down TimeStep, a)} deriving (Eq, Show)
+newtype Event a = Event {unEvent :: (Down TimeStep, a)} deriving (Eq, Ord, Show)
 
 instance Functor Event where
   fmap f = Event . fmap f . unEvent
@@ -26,9 +27,10 @@ instance Functor Event where
 -- at which they happened.
 newtype Events a = Events {unEvents :: [Event a]} deriving (Eq, Show)
 
+-- | Smart constructor that ensures the list of Events is sorted.
+events :: Ord a => [Event a] -> Events a
+events es = Events $ sort es
+
 instance Functor Events where
   fmap f = Events . (fmap . fmap) f . unEvents
   (<$) f = Events . (fmap . (<$)) f . unEvents
-
--- instance Semigroup (Events a) where
---   earlier <> later = Events $ unEvents earlier <> unEvents later
