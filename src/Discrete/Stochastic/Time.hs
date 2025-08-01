@@ -59,7 +59,7 @@ next :: Time -> Time
 next (Finite n) = Finite (n + 1)
 next Infinite = Infinite
 
--- | A discrete time step. Can be either a finite `Duration` (when taking the 
+-- | A discrete time step. Can be either a finite `Duration` (when taking the
 -- difference between two Finite times), or `Indeterminate` (when adding or
 -- subtracing an Infinite time).
 data Duration = Duration Int | Indeterminate deriving (Eq, Ord, Show)
@@ -68,9 +68,9 @@ after :: Duration -> Time -> Time
 after (Duration d) (Finite t) = Finite $ d + t
 after _ _ = Infinite
 
-diff :: Time -> Time -> Duration
-diff (Finite t1) (Finite t2) = Duration $ t2 - t1
-diff _ _ = Indeterminate
+to :: Time -> Time -> Duration
+to (Finite t1) (Finite t2) = Duration $ t2 - t1
+to _ _ = Indeterminate
 
 ----------             Time Processes             ----------
 
