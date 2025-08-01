@@ -1,8 +1,11 @@
 {-# LANGUAGE InstanceSigs #-}
 
-module Discrete.Stochastic.Time () where
-
-import qualified Data.Ord as Ord
+module Discrete.Stochastic.Time
+  ( Semiring (..),
+    Time (..),
+    Duration (..),
+  )
+where
 
 ------------------------------------------------------------
 --                         Events                         --
@@ -98,5 +101,3 @@ konst = Observable . const
 
 timeTo :: Time -> Observable Duration
 timeTo t1 = Observable $ \t2 -> t2 `to` t1
-
---
