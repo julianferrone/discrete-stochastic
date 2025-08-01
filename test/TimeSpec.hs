@@ -58,14 +58,25 @@ spec = do
       Infinite `to` Infinite `shouldBe` Indeterminate
   describe "Observable" $ do
     it "konst returns constant value at any time" $ do
-      let o = konst "abc"
-      sample o (Finite 1) `shouldBe` "abc"
-      sample o Infinite `shouldBe` "abc"
+      let obs = konst "abc"
+      sample obs (Finite 1) `shouldBe` "abc"
+      sample obs Infinite `shouldBe` "abc"
     it "timeTo should return correct durations" $ do
-      let o = timeTo $ Finite 10
+      let obs = timeTo $ Finite 10
       let t1 = Finite 2
       let t2 = Finite 15
       let t3 = Infinite
-      sample o t1 `shouldBe` Duration 8
-      sample o t2 `shouldBe` Duration (-5)
-      sample o t3 `shouldBe` Indeterminate
+      sample obs t1 `shouldBe` Duration 8
+      sample obs t2 `shouldBe` Duration (-5)
+      sample obs t3 `shouldBe` Indeterminate
+  describe "Observable functor laws hold" $ do
+    it "fmap id obs == obs" $ do
+      let obs = timeTo $ Finite 10
+      let t = Finite 5
+      sample obs t `shouldBe` sample (fmap id obs) t
+    it "fmap f (fmap g obs) == fmap (f . g) obs" $ do
+      let obs = konst 0
+      let f = show
+      let g = (+ 1)
+      let t = Finite 10
+      sample (fmap f (fmap g obs)) t `shouldBe` sample (fmap (f . g) obs) t
