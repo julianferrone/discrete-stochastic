@@ -2,6 +2,8 @@
 
 module Discrete.Stochastic.Time
   ( Time (..),
+    previous,
+    next,
     Duration (..),
     after,
     to,
