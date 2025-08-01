@@ -56,6 +56,7 @@ test-suite discrete-stochastic-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      TimeSpec
       Paths_discrete_stochastic
   autogen-modules:
       Paths_discrete_stochastic
@@ -65,4 +66,5 @@ test-suite discrete-stochastic-test
   build-depends:
       base >=4.7 && <5
     , discrete-stochastic
+    , hspec
   default-language: Haskell2010
