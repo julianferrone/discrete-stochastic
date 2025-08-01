@@ -118,7 +118,7 @@ instance Applicative Observable where
 
 instance Monad Observable where
   (>>=) :: Observable a -> (a -> Observable b) -> Observable b
-  o >>= f = Observable $ f . sample o >>= sample
+  obs >>= f = Observable $ f . sample obs >>= sample
 
 instance (Semiring r) => Semiring (Observable r) where
   nil = konst nil
