@@ -76,6 +76,9 @@ to _ _ = Indeterminate
 
 newtype Observable a = Observable (Time -> a)
 
+sample :: Time -> Observable a -> a
+sample t (Observable f) = f t
+
 instance Functor Observable where
   fmap f (Observable g) = Observable $ f . g
 
@@ -93,3 +96,7 @@ instance (Semiring r) => Semiring (Observable r) where
 konst :: a -> Observable a
 konst = Observable . const
 
+timeTo :: Time -> Observable Duration
+timeTo t1 = Observable $ \t2 -> t2 `to` t1
+
+--
