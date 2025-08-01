@@ -38,8 +38,8 @@ instance (Semiring b) => Semiring (a -> b) where
 
 ----------                  Time                  ----------
 
--- | Type of discrete timestep. It can be either a specific,
--- finite timestep, or a timestep infinitely far into the future.
+-- | Discrete time point. Can be either a `Finite` time, or a time infinitely far
+-- into the future `Infinite`.
 data Time = Finite Int | Infinite deriving (Eq, Ord, Show)
 
 instance Semiring Time where
@@ -52,16 +52,25 @@ epoch :: Time
 epoch = Finite 0
 
 previous :: Time -> Maybe Time
-previous (Finite t) | t > 0 = Just $ Finite $ t - 1
+previous (Finite t) | t > 0 = Just . Finite $ t - 1
 previous _ = Nothing
 
 next :: Time -> Time
 next (Finite n) = Finite (n + 1)
 next Infinite = Infinite
 
-diff :: Time -> Time -> Maybe Int
-diff (Finite t1) (Finite t2) = Just $ t2 - t1
-diff _ _ = Nothing
+-- | A discrete time step. Can be either a finite `Duration` (when taking the 
+-- difference between two Finite times), or `Indeterminate` (when adding or
+-- subtracing an Infinite time).
+data Duration = Duration Int | Indeterminate deriving (Eq, Ord, Show)
+
+after :: Duration -> Time -> Time
+after (Duration d) (Finite t) = Finite $ d + t
+after _ _ = Infinite
+
+diff :: Time -> Time -> Duration
+diff (Finite t1) (Finite t2) = Duration $ t2 - t1
+diff _ _ = Indeterminate
 
 ----------             Time Processes             ----------
 
@@ -83,3 +92,4 @@ instance (Semiring r) => Semiring (Observable r) where
 
 konst :: a -> Observable a
 konst = Observable . const
+
