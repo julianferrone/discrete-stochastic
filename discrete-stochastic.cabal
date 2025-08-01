@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Discrete.Stochastic.Probability
       Discrete.Stochastic.Semiring
       Discrete.Stochastic.Time
       Lib
