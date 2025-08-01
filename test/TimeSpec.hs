@@ -80,3 +80,43 @@ spec = do
       let g = (+ 1)
       let t = Finite 10
       sample (fmap f (fmap g obs)) t `shouldBe` sample (fmap (f . g) obs) t
+  describe "Duration semiring laws hold" $ do
+    it "Duration `plus` nil == time == nil `plus` Duration" $ do
+      let d = Duration 2
+      (d `plus` nil) `shouldBe` d
+      (nil `plus` d) `shouldBe` d
+    it "Indeterminate `plus` nil == time == nil `plus` Indeterminate" $ do
+      let d = Indeterminate
+      (d `plus` nil) `shouldBe` d
+      (nil `plus` d) `shouldBe` d
+    it "Duration `times` unit == time == unit `times` Duration" $ do
+      let d = Duration 3
+      (d `times` unit) `shouldBe` d
+      (unit `times` d) `shouldBe` d
+    it "Indeterminate `times` unit == time == unit `times` Indeterminate" $ do
+      let d = Indeterminate
+      (d `times` unit) `shouldBe` d
+      (unit `times` d) `shouldBe` d
+    it "Duration `times` nil == nil" $ do
+      let a = Duration 10
+      a `times` nil `shouldBe` nil
+      nil `times` a `shouldBe` nil
+    it "Indeterminate `times` nil == nil" $ do
+      let a = Indeterminate
+      a `times` nil `shouldBe` nil
+      nil `times` a `shouldBe` nil
+    it "Multiplication distributes over addition" $ do
+      let a = Duration 4
+      let b = Duration 5
+      let c = Duration 6
+      a `times` (b `plus` c) `shouldBe` (a `times` b) `plus` (a `times` c)
+      (b `plus` c) `times` a `shouldBe` (b `times` a) `plus` (c `times` a)
+  describe "Observable semiring" $ do
+    it "adding two Observables together adds their underlying values pointwise" $ do
+      let obs1 = timeTo (Finite 3)
+      let obs2 = timeTo (Finite 5)
+      sample (obs1 `plus` obs2) epoch `shouldBe` Duration 5
+    it "multiplying two Observables together multiplies their underlying values pointwise" $ do
+      let obs1 = timeTo (Finite 1)
+      let obs2 = timeTo (Finite 2)
+      sample (obs1 `times` obs2) epoch `shouldBe` Duration 1
