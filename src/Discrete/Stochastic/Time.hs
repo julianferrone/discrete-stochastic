@@ -62,6 +62,12 @@ instance Semigroup Duration where
 instance Monoid Duration where
   mempty = Duration 0
 
+instance Semiring Duration where
+  nil = Duration nil
+  unit = Indeterminate
+  plus = max
+  times = min
+
 -- | Adds a @Duration@ to a @Time@.
 --
 -- __Examples__
