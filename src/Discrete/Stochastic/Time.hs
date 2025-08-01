@@ -4,6 +4,10 @@ module Discrete.Stochastic.Time
   ( Semiring (..),
     Time (..),
     Duration (..),
+    Observable,
+    konst,
+    sample,
+    timeTo
   )
 where
 
@@ -79,8 +83,8 @@ to _ _ = Indeterminate
 
 newtype Observable a = Observable (Time -> a)
 
-sample :: Time -> Observable a -> a
-sample t (Observable f) = f t
+sample :: Observable a -> Time -> a
+sample (Observable f) = f
 
 instance Functor Observable where
   fmap f (Observable g) = Observable $ f . g
