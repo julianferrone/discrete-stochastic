@@ -2,7 +2,7 @@ module TimeSpec (spec) where
 
 import Discrete.Stochastic.Semiring
 import Discrete.Stochastic.Time
-import Test.Hspec
+import Test.Hspec hiding (after)
 
 spec :: Spec
 spec = do
@@ -33,9 +33,29 @@ spec = do
     it "Mappending a duration with identity is equal to the original identity" $ do
       Duration 1 <> mempty `shouldBe` Duration 1
       mempty <> Duration 1 `shouldBe` Duration 1
+  describe "Time" $ do
+    it "Previous returns Just Time for finite times after the epoch" $ do
+      previous (Finite 5) `shouldBe` Just (Finite 4)
+    it "Previous returns Nothing for the epoch" $ do
+      previous epoch `shouldBe` Nothing
+    it "Previous returns Nothing for the infinite future" $ do
+      previous Infinite `shouldBe` Nothing
+    it "Next returns the next value for a finite time" $ do
+      next epoch `shouldBe` Finite 1
+    it "Next returns Infinite for Infinite" $ do
+      next Infinite `shouldBe` Infinite
   describe "Time and Duration interactions" $ do
-    it "The empty Duration after a Time should be the same Time" $ do
+    it "A Finite should be the same Finite after a mempty duration has passed" $ do
       mempty `after` Finite 5 `shouldBe` Finite 5
+    it "An Infinite should be Infinite after any duration has passed" $ do
+      Duration 5 `after` Infinite `shouldBe` Infinite
+    it "Two Finite times have a determinate Duration between them" $ do
+      Finite 3 `to` Finite 10 `shouldBe` Duration 7
+      Finite 10 `to` Finite 8 `shouldBe` Duration (-2)
+    it "An Infinite time has an Indeterminate duration to/from any other time" $ do
+      Infinite `to` Finite 1 `shouldBe` Indeterminate
+      Finite 2 `to` Infinite `shouldBe` Indeterminate
+      Infinite `to` Infinite `shouldBe` Indeterminate
   describe "Observable" $ do
     it "konst returns constant value at any time" $ do
       let o = konst "abc"
