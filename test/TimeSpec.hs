@@ -1,7 +1,8 @@
 module TimeSpec (spec) where
 
-import Test.Hspec
+import Discrete.Stochastic.Semiring
 import Discrete.Stochastic.Time
+import Test.Hspec
 
 spec :: Spec
 spec = do
@@ -24,11 +25,22 @@ spec = do
       let c = Finite 6
       a `times` (b `plus` c) `shouldBe` (a `times` b) `plus` (a `times` c)
       (b `plus` c) `times` a `shouldBe` (b `times` a) `plus` (c `times` a)
+  describe "Duration monoid laws hold" $ do
+    it "Mappending two durations adds them together" $ do
+      Duration 2 <> Duration 7 `shouldBe` Duration 9
+    it "Mappending two durations is commutative" $ do
+      Duration 5 <> Duration 10 `shouldBe` Duration 10 <> Duration 5
+    it "Mappending a duration with identity is equal to the original identity" $ do
+      Duration 1 <> mempty `shouldBe` Duration 1
+      mempty <> Duration 1 `shouldBe` Duration 1
+  describe "Time and Duration interactions" $ do
+    it "The empty Duration after a Time should be the same Time" $ do
+      mempty `after` Finite 5 `shouldBe` Finite 5
   describe "Observable" $ do
     it "konst returns constant value at any time" $ do
-      let o = konst 10
-      sample o (Finite 1) `shouldBe` 10
-      sample o Infinite `shouldBe` 10
+      let o = konst "abc"
+      sample o (Finite 1) `shouldBe` "abc"
+      sample o Infinite `shouldBe` "abc"
     it "timeTo should return correct durations" $ do
       let o = timeTo $ Finite 10
       let t1 = Finite 2
