@@ -34,6 +34,6 @@ spec = do
       let t1 = Finite 2
       let t2 = Finite 15
       let t3 = Infinite
-      sample o t1 `shouldBe` (Duration 8)
-      sample o t2 `shouldBe` (Duration (-5))
+      sample o t1 `shouldBe` Duration 8
+      sample o t2 `shouldBe` Duration (-5)
       sample o t3 `shouldBe` Indeterminate
