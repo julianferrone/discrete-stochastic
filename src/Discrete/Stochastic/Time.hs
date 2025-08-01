@@ -7,7 +7,7 @@ module Discrete.Stochastic.Time
     Observable,
     konst,
     sample,
-    timeTo
+    timeTo,
   )
 where
 
@@ -93,6 +93,12 @@ instance Applicative Observable where
   pure = konst
   (<*>) :: Observable (a -> b) -> Observable a -> Observable b
   Observable f <*> Observable g = Observable $ \t -> f t (g t)
+
+instance Monad Observable where
+  (>>=) :: Observable a -> (a -> Observable b) -> Observable b
+  o >>= f = Observable $ f . sample o >>= sample
+
+-- (>>=) :: (Time -> a) -> (a -> (Time -> b)) -> (Time -> b)
 
 instance (Semiring r) => Semiring (Observable r) where
   nil = konst nil
