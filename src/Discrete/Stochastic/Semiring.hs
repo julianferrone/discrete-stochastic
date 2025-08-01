@@ -1,19 +1,16 @@
 module Discrete.Stochastic.Semiring (Semiring (..)) where
 
--- | A type @s@ is a Semiring if it provides:
--- - An addition operation @plus@ which, given two elements @s@, returns another element @s@
--- - A multiplication operation @times@ which, given two elements @s@, returns another element @s@
--- - An identity element for addition @nil@
--- - An identity element for multiplication @unit@
+-- | The class of semirings (types with an additive binary operation that has
+-- an identity and a multiplicative binary operation that has an identity).
 --
 -- Futhermore, @s@ needs to adhere to the following laws:
 --
--- [Identity Of Addition] @'plus' 'a' 'nil' == 'a' == 'plus' 'nil' 'a'@
--- [Commutativity Of Addition] @'plus' 'a' 'b' == 'plus' 'b' 'a'@
--- [Associativity Of Addition] @'plus' ('plus' 'a' 'b') 'c' == 'plus' 'a' ('plus' 'b' 'c') @
+-- [Identity of Addition] @'plus' 'a' 'nil' == 'a' == 'plus' 'nil' 'a'@
+-- [Commutativity of Addition] @'plus' 'a' 'b' == 'plus' 'b' 'a'@
+-- [Associativity of Addition] @'plus' ('plus' 'a' 'b') 'c' == 'plus' 'a' ('plus' 'b' 'c') @
 -- [Identity of Multiplication] @'times' 'a' 'unit' == 'a' == 'times' 'unit' 'a'@
--- [Associativity Of Multiplication] @'times' ('times' 'a' 'b') 'c' == 'times' 'a' ('times' 'b' 'c') @
--- [Annihilation by Additive Identity through Multiplication] @'times' 'nil' 'a' == 'nil' == 'times' 'a' 'nil'@
+-- [Associativity of Multiplication] @'times' ('times' 'a' 'b') 'c' == 'times' 'a' ('times' 'b' 'c') @
+-- [Annihilation] @'times' 'nil' 'a' == 'nil' == 'times' 'a' 'nil'@
 -- [Multiplication Left-Distributes over Addition] @'times' 'a' ('plus' 'b' 'c') == 'plus' ('times' 'a' 'b') ('times' 'a' 'c')@
 -- [Multiplication Right-Distributes over Addition] @'times' ('plus' 'b' 'c') 'a' == 'plus' ('times' 'b' 'a') ('times' 'c' 'a')@
 class Semiring s where

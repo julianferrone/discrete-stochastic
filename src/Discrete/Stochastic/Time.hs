@@ -105,6 +105,13 @@ newtype Observable a = Observable (Time -> a)
 
 -- | Samples an @Observable a@ at a given @Time@, returning a quantity of type
 -- @a@.
+--
+-- __Examples__
+--
+-- >>> sample (konst 5) (Finite 10)
+-- 5
+-- >>> sample (konst 5) Infinite
+-- 5
 sample :: Observable a -> Time -> a
 sample (Observable f) = f
 
