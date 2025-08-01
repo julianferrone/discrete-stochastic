@@ -52,6 +52,13 @@ next Infinite = Infinite
 -- (@Infinite@.)
 data Duration = Duration Int | Indeterminate deriving (Eq, Ord, Show)
 
+instance Semigroup Duration where
+  (Duration d1) <> (Duration d2) = Duration $ d1 + d2
+  _ <> _ = Indeterminate
+
+instance Monoid Duration where
+  mempty = Duration 0
+
 -- | Adds a @Duration@ to a @Time@.
 --
 -- __Examples__
