@@ -51,15 +51,21 @@ newtype Dist a = Dist [(Prob, a)]
 unDist :: Dist a -> [(Prob, a)]
 unDist (Dist xs) = xs
 
+normaliseDist :: Dist a -> Dist a
+normaliseDist (Dist xs) = Dist $ map (\(p, x) -> (prob (unProb p / totalP), x)) xs
+  where
+    totalP :: Double
+    totalP = sum . fmap (unProb . fst) $ xs
+
 instance Functor Dist where
   fmap f (Dist xs) = Dist [(p, f x) | (p, x) <- xs]
 
 instance Applicative Dist where
   pure x = Dist [(almostSurely, x)]
-  (Dist fs) <*> (Dist xs) = Dist [(pf & px, f x) | (pf, f) <- fs, (px, x) <- xs]
+  (Dist fs) <*> (Dist xs) = Dist [(pf `ptimes` px, f x) | (pf, f) <- fs, (px, x) <- xs]
 
 dconcat :: Dist (Dist a) -> Dist a
-dconcat (Dist ds) = Dist [(pd & px, x) | (pd, subDists) <- ds, (px, x) <- unDist subDists]
+dconcat (Dist ds) = normaliseDist $ Dist [(pd `ptimes` px, x) | (pd, subDists) <- ds, (px, x) <- unDist subDists]
 
 instance Monad Dist where
   return = pure
