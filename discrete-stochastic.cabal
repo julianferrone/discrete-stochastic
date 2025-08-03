@@ -58,6 +58,7 @@ test-suite discrete-stochastic-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      ProbabilitySpec
       TimeSpec
       Paths_discrete_stochastic
   autogen-modules:
