@@ -4,7 +4,7 @@ module Discrete.Stochastic.Probability
     prob,
     almostSurely,
     almostNever,
-    notP,
+    pnot,
     Dist,
   )
 where
@@ -21,17 +21,26 @@ clamp f c d = max f $ min c d
 prob :: Double -> Prob
 prob = Prob . clamp 0 1
 
+unProb :: Prob -> Double
+unProb (Prob p) = p
+
 almostSurely :: Prob
-almostSurely = Prob 1
+almostSurely = prob 1
 
 almostNever :: Prob
-almostNever = Prob 0
+almostNever = prob 0
 
-not :: Prob -> Prob
-not (Prob p) = Prob $ 1 - p
+pnot :: Prob -> Prob
+pnot (Prob p) = prob $ 1 - p
 
-(&) :: Prob -> Prob -> Prob
-(Prob p1) & (Prob p2) = Prob (p1 * p2)
+padd :: Prob -> Prob -> Prob
+padd (Prob p1) (Prob p2) = prob (p1 + p2)
+
+ptimes :: Prob -> Prob -> Prob
+ptimes (Prob p1) (Prob p2) = prob (p1 * p2)
+
+pdiv :: Prob -> Prob -> Prob
+pdiv (Prob p1) (Prob p2) = prob (p1 / p2)
 
 ------------------------------------------------------------
 --                Probability Distribution                --
