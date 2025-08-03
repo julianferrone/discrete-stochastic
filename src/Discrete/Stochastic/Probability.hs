@@ -57,6 +57,9 @@ normaliseDist (Dist xs) = Dist $ map (\(p, x) -> (prob (unProb p / totalP), x)) 
     totalP :: Double
     totalP = sum . fmap (unProb . fst) $ xs
 
+measure :: Dist a -> Prob
+measure = foldr (padd . fst) almostNever . unDist
+
 instance Functor Dist where
   fmap f (Dist xs) = Dist [(p, f x) | (p, x) <- xs]
 
