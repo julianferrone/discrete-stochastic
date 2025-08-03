@@ -6,6 +6,7 @@ module Discrete.Stochastic.Probability
     almostNever,
     pnot,
     Dist,
+    measure,
   )
 where
 
@@ -13,7 +14,7 @@ where
 --                       Probability                      --
 ------------------------------------------------------------
 
-newtype Prob = Prob Double
+newtype Prob = Prob Double deriving (Eq, Ord, Show)
 
 clamp :: Double -> Double -> Double -> Double
 clamp f c d = max f $ min c d
@@ -39,14 +40,11 @@ padd (Prob p1) (Prob p2) = prob (p1 + p2)
 ptimes :: Prob -> Prob -> Prob
 ptimes (Prob p1) (Prob p2) = prob (p1 * p2)
 
-pdiv :: Prob -> Prob -> Prob
-pdiv (Prob p1) (Prob p2) = prob (p1 / p2)
-
 ------------------------------------------------------------
 --                Probability Distribution                --
 ------------------------------------------------------------
 
-newtype Dist a = Dist [(Prob, a)]
+newtype Dist a = Dist [(Prob, a)] deriving (Eq, Ord, Show)
 
 unDist :: Dist a -> [(Prob, a)]
 unDist (Dist xs) = xs
