@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module Discrete.Stochastic.Probability
   ( Prob,
     clamp,
@@ -6,23 +8,30 @@ module Discrete.Stochastic.Probability
     almostNever,
     pnot,
     Dist,
+    dist,
+    combineOutcomes,
     measure,
+    coin,
+    uniform,
+    die
   )
 where
+
+import qualified Data.Map as Map
 
 ------------------------------------------------------------
 --                       Probability                      --
 ------------------------------------------------------------
 
-newtype Prob = Prob Double deriving (Eq, Ord, Show)
+newtype Prob = Prob Rational deriving (Eq, Ord, Show)
 
-clamp :: Double -> Double -> Double -> Double
+clamp :: Rational -> Rational -> Rational -> Rational
 clamp f c d = max f $ min c d
 
-prob :: Double -> Prob
+prob :: Rational -> Prob
 prob = Prob . clamp 0 1
 
-unProb :: Prob -> Double
+unProb :: Prob -> Rational
 unProb (Prob p) = p
 
 almostSurely :: Prob
@@ -44,30 +53,58 @@ ptimes (Prob p1) (Prob p2) = prob (p1 * p2)
 --                Probability Distribution                --
 ------------------------------------------------------------
 
-newtype Dist a = Dist [(Prob, a)] deriving (Eq, Ord, Show)
+-- class Distribution where
+  -- sampleSpace :: Distribution d -> [d]
+  -- probability :: Distribution d -> d -> Prob
 
-unDist :: Dist a -> [(Prob, a)]
+newtype Dist a = Dist [(a, Prob)] deriving (Eq, Ord, Show)
+
+dist :: [(a, Prob)] -> Dist a
+dist = normalise . Dist
+
+unDist :: Dist a -> [(a, Prob)]
 unDist (Dist xs) = xs
 
-normaliseDist :: Dist a -> Dist a
-normaliseDist (Dist xs) = Dist $ map (\(p, x) -> (prob (unProb p / totalP), x)) xs
+normalise :: Dist a -> Dist a
+normalise (Dist xs) = Dist $ map (\(x, p) -> (x, prob (unProb p / totalP))) xs
   where
-    totalP :: Double
-    totalP = sum . fmap (unProb . fst) $ xs
+    totalP :: Rational
+    totalP = sum . fmap (unProb . snd) $ xs
 
 measure :: Dist a -> Prob
-measure = foldr (padd . fst) almostNever . unDist
+measure = foldr (padd . snd) almostNever . unDist
+
+sampleSpace :: Dist a -> [a]
+sampleSpace = fmap fst . unDist
+
+combineOutcomes :: (Ord a) => Dist a -> Dist a
+combineOutcomes = dist . Map.toList . Map.fromListWith padd . unDist
 
 instance Functor Dist where
-  fmap f (Dist xs) = Dist [(p, f x) | (p, x) <- xs]
+  fmap f (Dist xs) = Dist [(f x, p) | (x, p) <- xs]
 
 instance Applicative Dist where
-  pure x = Dist [(almostSurely, x)]
-  (Dist fs) <*> (Dist xs) = Dist [(pf `ptimes` px, f x) | (pf, f) <- fs, (px, x) <- xs]
+  pure x = Dist [(x, almostSurely)]
+  (Dist fs) <*> (Dist xs) = Dist [(f x, pf `ptimes` px) | (f, pf) <- fs, (x, px) <- xs]
 
 dconcat :: Dist (Dist a) -> Dist a
-dconcat (Dist ds) = normaliseDist $ Dist [(pd `ptimes` px, x) | (pd, subDists) <- ds, (px, x) <- unDist subDists]
+dconcat (Dist ds) =
+  normalise $
+    Dist
+      [ (x, pd `ptimes` px)
+        | (subDists, pd) <- ds,
+          (x, px) <- unDist subDists
+      ]
 
 instance Monad Dist where
   return = pure
   distXs >>= f = dconcat $ fmap f distXs
+
+coin :: Prob -> a -> a -> Dist a
+coin p a b = dist [(a, p), (b, pnot p)]
+
+uniform :: [a] -> Dist a
+uniform = dist . fmap (,almostSurely)
+
+die :: Int -> Dist Int
+die n = uniform [1..n]
