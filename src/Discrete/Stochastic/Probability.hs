@@ -1,4 +1,13 @@
-module Discrete.Stochastic.Probability where
+module Discrete.Stochastic.Probability
+  ( Prob,
+    clamp,
+    prob,
+    almostSurely,
+    almostNever,
+    notP,
+    Dist,
+  )
+where
 
 ------------------------------------------------------------
 --                       Probability                      --
