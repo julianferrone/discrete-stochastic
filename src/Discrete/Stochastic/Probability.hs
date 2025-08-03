@@ -27,3 +27,22 @@ not (Prob p) = Prob $ 1 - p
 ------------------------------------------------------------
 --                Probability Distribution                --
 ------------------------------------------------------------
+
+newtype Dist a = Dist [(Prob, a)]
+
+unDist :: Dist a -> [(Prob, a)]
+unDist (Dist xs) = xs
+
+instance Functor Dist where
+  fmap f (Dist xs) = Dist [(p, f x) | (p, x) <- xs]
+
+instance Applicative Dist where
+  pure x = Dist [(almostSurely, x)]
+  (Dist fs) <*> (Dist xs) = Dist [(pf & px, f x) | (pf, f) <- fs, (px, x) <- xs]
+
+dconcat :: Dist (Dist a) -> Dist a
+dconcat (Dist ds) = Dist [(pd & px, x) | (pd, subDists) <- ds, (px, x) <- unDist subDists]
+
+instance Monad Dist where
+  return = pure
+  distXs >>= f = dconcat $ fmap f distXs
