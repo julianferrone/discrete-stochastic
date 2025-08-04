@@ -28,6 +28,8 @@ import qualified Data.Map as Map
 -- | The type of probabilities, which must be between 0 and 1 (inclusive).
 newtype Prob = Prob Rational deriving (Eq, Ord, Show)
 
+---------- Probability Constructor and Destructor ----------
+
 -- | Clamps a rational number between a floor and a ceiling
 clamp :: Rational -> Rational -> Rational -> Rational
 clamp f c r = max f $ min c r
@@ -41,6 +43,8 @@ prob = Prob . clamp 0 1
 unProb :: Prob -> Rational
 unProb (Prob p) = p
 
+----------           Named Probabilities          ----------
+
 -- | The probability that an event will almost surely happen i.e. with
 -- probability 1.
 almostSurely :: Prob
@@ -50,6 +54,8 @@ almostSurely = prob 1
 -- probability 0.
 almostNever :: Prob
 almostNever = prob 0
+
+----------         Probability Arithmetic         ----------
 
 -- | Probability "not".
 --
@@ -79,7 +85,7 @@ ptimes (Prob p1) (Prob p2) = prob (p1 * p2)
 ------------------------------------------------------------
 
 -- | The type of discrete probability distributions. A @Dist a@ wraps
--- a list of possible outcomes @[a]@ with the outcome's associated 
+-- a list of possible outcomes @[a]@ with the outcome's associated
 -- possibilities @Prob@.
 newtype Dist a = Dist [(a, Prob)] deriving (Eq, Ord, Show)
 
@@ -115,6 +121,8 @@ sampleSpace = fmap fst . unDist
 combineOutcomes :: (Ord a) => Dist a -> Dist a
 combineOutcomes = dist . Map.toList . Map.fromListWith padd . unDist
 
+----------           Typeclass Instances          ----------
+
 instance Functor Dist where
   fmap f (Dist xs) = Dist [(f x, p) | (x, p) <- xs]
 
@@ -126,8 +134,8 @@ instance Applicative Dist where
 --
 -- __Examples__
 --
--- >>> dconcat $ coin 
---   (prob 0.6) 
+-- >>> dconcat $ coin
+--   (prob 0.6)
 --   (coin (prob 0.7) "a" "b")
 --   (coin (prob 0.8) "c" "d")
 -- Dist [
@@ -148,6 +156,8 @@ dconcat (Dist ds) =
 instance Monad Dist where
   return = pure
   distXs >>= f = dconcat $ fmap f distXs
+
+----------  Predefined Discrete Probability Distributions   ----------
 
 -- | Creates a probability distribution for a weighted coin.
 --
