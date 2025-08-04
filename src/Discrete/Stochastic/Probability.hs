@@ -9,11 +9,12 @@ module Discrete.Stochastic.Probability
     pnot,
     Dist,
     dist,
+    sampleSpace,
     combineOutcomes,
     measure,
     coin,
     uniform,
-    die
+    die,
   )
 where
 
@@ -52,10 +53,6 @@ ptimes (Prob p1) (Prob p2) = prob (p1 * p2)
 ------------------------------------------------------------
 --                Probability Distribution                --
 ------------------------------------------------------------
-
--- class Distribution where
-  -- sampleSpace :: Distribution d -> [d]
-  -- probability :: Distribution d -> d -> Prob
 
 newtype Dist a = Dist [(a, Prob)] deriving (Eq, Ord, Show)
 
@@ -107,4 +104,4 @@ uniform :: [a] -> Dist a
 uniform = dist . fmap (,almostSurely)
 
 die :: Int -> Dist Int
-die n = uniform [1..n]
+die n = uniform [1 .. n]
