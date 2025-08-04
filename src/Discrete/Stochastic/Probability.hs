@@ -78,7 +78,9 @@ ptimes (Prob p1) (Prob p2) = prob (p1 * p2)
 --                Probability Distribution                --
 ------------------------------------------------------------
 
--- | The type of discrete probability distributions.
+-- | The type of discrete probability distributions. A @Dist a@ wraps
+-- a list of possible outcomes @[a]@ with the outcome's associated 
+-- possibilities @Prob@.
 newtype Dist a = Dist [(a, Prob)] deriving (Eq, Ord, Show)
 
 -- | Smart constructor for a @Dist@, enforcing that the sum of all
