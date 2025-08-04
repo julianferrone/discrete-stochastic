@@ -11,7 +11,7 @@ spec = do
     it "pnot almostNever == almostSurely" $ do
       pnot almostNever `shouldBe` almostSurely
   describe "Dist" $ do
-    it "accurately calculates the sum of two six-sided fair dice" $ do
+    it "accurately calculates the sum of two six-sided fair dice with applicative" $ do
       let d = combineOutcomes $ liftA2 (+) (die 6) (die 6)
       d
         `shouldBe` dist
@@ -27,3 +27,22 @@ spec = do
             (11, prob (2 / 36)),
             (12, prob (1 / 36))
           ]
+    it "Biased coin using monad functionality" $ do
+      conditionalCoin
+        `shouldBe` dist
+          [ (False, prob (11 / 25)),
+            (True, prob (14 / 25))
+          ]
+    it "fmap doesn't change probabilities" $ do
+      fmap show (coin (prob 0.5) True False)
+        `shouldBe` dist
+          [ ("True", prob (1 / 2)),
+            ("False", prob (1 / 2))
+          ]
+  where
+    conditionalCoin :: Dist Bool
+    conditionalCoin = combineOutcomes $ do
+      number <- die 5
+      if number == 5
+        then coin (prob 0.8) True False
+        else coin (prob 0.5) True False
