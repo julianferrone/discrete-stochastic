@@ -12,6 +12,7 @@ module Discrete.Stochastic.Probability
     sampleSpace,
     combineOutcomes,
     measure,
+    dconcat,
     coin,
     uniform,
     die,
@@ -119,6 +120,20 @@ instance Applicative Dist where
   pure x = Dist [(x, almostSurely)]
   (Dist fs) <*> (Dist xs) = Dist [(f x, pf `ptimes` px) | (f, pf) <- fs, (x, px) <- xs]
 
+-- | Flattens a @Dist (Dist a)@ to a @Dist a@.
+--
+-- __Examples__
+--
+-- >>> dconcat $ coin 
+--   (prob 0.6) 
+--   (coin (prob 0.7) "a" "b")
+--   (coin (prob 0.8) "c" "d")
+-- Dist [
+--    ("a",Prob (21 % 50)),
+--    ("b",Prob (9 % 50)),
+--    ("c",Prob (8 % 25)),
+--    ("d",Prob (2 % 25))
+--   ]
 dconcat :: Dist (Dist a) -> Dist a
 dconcat (Dist ds) =
   normalise $
